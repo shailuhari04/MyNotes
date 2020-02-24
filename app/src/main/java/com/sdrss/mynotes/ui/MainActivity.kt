@@ -37,11 +37,11 @@ class MainActivity : AppCompatActivity() {
                     if (!isUpdate) insertData(user = user) else updateData(user = user)
 
                     btnCloseClickListener {
-                        showVLog("Notes Dialog close icon clicked")
+                        showVLog("Notes Dialog Close Button clicked")
                     }
 
                     btnSubmitClickListener {
-                        showVLog("Notes Dialog done icon clicked")
+                        showVLog("Notes Dialog Submit Button clicked")
                     }
                 }
             //  and showing
