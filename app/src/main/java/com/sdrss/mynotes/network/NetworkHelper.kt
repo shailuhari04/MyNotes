@@ -23,7 +23,7 @@ object NetworkHelper : INetworkHelper {
         requestType: String,
         isDoOutput: Boolean
     ): HttpURLConnection? {
-        val baseUrl = "http://192.168.1.109:3001/"
+        val baseUrl = "http://192.168.31.237:3001/"
 
         return try {
             (URL("$baseUrl$endPoint").openConnection() as HttpURLConnection).apply {

@@ -4,10 +4,13 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.gson.Gson
 import com.sdrss.mynotes.R
-import com.sdrss.mynotes.User
 import com.sdrss.mynotes.network.NetworkHelper
+import com.sdrss.mynotes.pojo.User
+import com.sdrss.mynotes.pojo.UserResponse
 import com.sdrss.mynotes.utils.isOnline
+import com.sdrss.mynotes.utils.showDLog
 import com.sdrss.mynotes.utils.showNotesAlertDialog
 import com.sdrss.mynotes.utils.showVLog
 import kotlinx.android.synthetic.main.activity_main.*
@@ -20,6 +23,8 @@ class MainActivity : AppCompatActivity() {
 
     private var user: User? = null
 
+    private val adapter by lazy { NotesAdapter() }
+
     private var isUpdate: Boolean = false
     private var notesDialog: AlertDialog? = null
 
@@ -28,7 +33,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         floatingActionButton.setOnClickListener {
-            tvData.text = ""
             if (notesDialog == null)
                 notesDialog = showNotesAlertDialog {
 
@@ -48,22 +52,32 @@ class MainActivity : AppCompatActivity() {
             notesDialog?.show()
         }
 
-        if (isOnline()) {
-            loadData() //load Data From Api
-        } else {
-
-        }
+        loadData() //load Data From Api
     }
 
     private fun loadData() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val result = NetworkHelper.getNetworkRequest()
-            Log.d("result", result)
-            runOnUiThread {
-                tvData.text = result
+
+        if (isOnline()) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val result = NetworkHelper.getNetworkRequest()
+                Log.d("result", result)
+                runOnUiThread {
+                    updateUI(result)
+                    // tvData.text = result
+                }
             }
+        } else {
+            //noInternet
         }
 
+    }
+
+    private fun updateUI(result: String) {
+        val userResponse = Gson().fromJson<UserResponse>(result, UserResponse::class.java)
+        rvNotes.adapter = adapter
+        userResponse?.data?.let { adapter.swapData(it) }
+        showDLog("$userResponse")
+        showDLog("${userResponse?.data}")
     }
 
     private fun updateData(user: User?) {
