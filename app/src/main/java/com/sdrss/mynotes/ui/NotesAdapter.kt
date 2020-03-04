@@ -14,6 +14,10 @@ import kotlinx.android.synthetic.main.record_item_layout.view.*
 
 class NotesAdapter : ListAdapter<User, NotesAdapter.NoteViewHolder>(NoteDiff()) {
 
+
+    var listenerForActionEdit: (user: User) -> Unit = { user: User ->  }
+    var listenerForActionDelete: (user: User) -> Unit = {user: User ->  }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         return NoteViewHolder(
             LayoutInflater.from(parent.context).inflate(
@@ -52,9 +56,19 @@ class NotesAdapter : ListAdapter<User, NotesAdapter.NoteViewHolder>(NoteDiff()) 
                 this@with.age?.let {
                     this@apply.tvAge.text = "$it yr"
                 }
+
+                //handle Click On Action Edit
+                this@apply.btnEdit.setOnClickListener {
+                    listenerForActionEdit.invoke(this@with)
+                }
+
+                //handle Click On Action Delete
+                this@apply.btnDelete.setOnClickListener {
+                    listenerForActionDelete.invoke(this@with)
+                }
             }
 
-            //handle last item
+            //handle last item divider visibility
             if (currentList.size - 1 == position) this@apply.viewDivider.gone()
         }
     }

@@ -32,28 +32,22 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        floatingActionButton.setOnClickListener {
-            if (notesDialog == null)
-                notesDialog = showNotesAlertDialog {
+        handleClickEvent()
 
-                    cancelable = false
-
-                    if (!isUpdate) insertData(user = user) else updateData(user = user)
-
-                    btnCloseClickListener {
-                        showVLog("Notes Dialog Close Button clicked")
-                    }
-
-                    btnSubmitClickListener {
-                        showVLog("Notes Dialog Submit Button clicked")
-                    }
-                }
-            //  and showing
-            notesDialog?.show()
-        }
 
         loadData() //load Data From Api
     }
+
+    private fun handleClickEvent() {
+        //initialize adapter listeners
+        adapter.listenerForActionEdit = this::actionEditHandle
+        adapter.listenerForActionDelete = this::actionDeleteHandle
+
+        floatingActionButton.setOnClickListener {
+            showDialog()
+        }
+    }
+
 
     private fun loadData() {
 
@@ -80,6 +74,56 @@ class MainActivity : AppCompatActivity() {
         showDLog("${userResponse?.data}")
     }
 
+    private fun showDialog() {
+        if (notesDialog == null)
+            notesDialog = showNotesAlertDialog {
+
+                cancelable = false
+
+                user?.let { data ->
+                    with(data) {
+                        data.name?.let {
+                            etName.setText(it)
+                        }
+
+                        data.email?.let {
+                            etEmail.setText(it)
+                        }
+
+                        data.phone?.let {
+                            etPhone.setText(it)
+                        }
+
+                        data.age?.let {
+                            etAge.setText(it)
+                        }
+
+                        data.password?.let {
+                            etPassword.setText(it)
+                        }
+                    }
+                }
+
+                if (!isUpdate) insertData(user = user) else updateData(user = user)
+
+                btnCloseClickListener {
+                    showVLog("Notes Dialog Close Button clicked")
+                }
+
+                btnSubmitClickListener {
+                    showVLog("Notes Dialog Submit Button clicked")
+                }
+
+                onCancelListener {
+                    notesDialog = null
+                    user = null
+                    showVLog("Notes Dialog Canceled")
+                }
+            }
+        //  and showing
+        notesDialog?.show()
+    }
+
     private fun updateData(user: User?) {
 
     }
@@ -87,4 +131,14 @@ class MainActivity : AppCompatActivity() {
     private fun insertData(user: User?) {
 
     }
+
+    private fun actionEditHandle(user: User?) {
+        this.user = user
+        showDialog()
+    }
+
+    private fun actionDeleteHandle(user: User?) {
+        this.user = user
+    }
+
 }
