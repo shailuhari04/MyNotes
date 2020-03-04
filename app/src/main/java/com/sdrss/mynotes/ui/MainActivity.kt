@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
 
         if (isOnline()) {
             CoroutineScope(Dispatchers.IO).launch {
-                val result = NetworkHelper.getNetworkRequest()
+                val result = NetworkHelper.getUserListNetworkRequest()
                 Log.d("result", result)
                 runOnUiThread {
                     updateUI(result)
